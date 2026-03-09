@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MiniMax 模型矩阵</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        
+        :root {
+            --black: #000000;
+            --white: #ffffff;
+            --gray-50: #fafafa;
+            --gray-100: #f4f4f5;
+            --gray-200: #e4e4e7;
+            --gray-300: #d4d4d8;
+            --gray-400: #a1a1aa;
+            --gray-500: #71717a;
+            --gray-600: #52525b;
+            --gray-700: #3f3f46;
+            --gray-800: #27272a;
+            --gray-900: #18181b;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--white);
+            color: var(--gray-900);
+            min-height: 100vh;
+            line-height: 1.5;
+        }
+        
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 80px 40px;
+        }
+        
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 60px 0 80px;
+        }
+        
+        .logo {
+            font-size: 72px;
+            font-weight: 800;
+            letter-spacing: -3px;
+            margin-bottom: 16px;
+        }
+        
+        .logo span {
+            color: var(--gray-900);
+        }
+        
+        .tagline {
+            font-size: 18px;
+            color: var(--gray-500);
+            font-weight: 400;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Stats */
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 100px;
+            padding: 40px 0 60px;
+            border-bottom: 1px solid var(--gray-200);
+            margin-bottom: 80px;
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat-num {
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--gray-900);
+            letter-spacing: -1px;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: var(--gray-500);
+            margin-top: 4px;
+        }
+        
+        /* Section */
+        .section {
+            margin-bottom: 80px;
+        }
+        
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        
+        .section-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            background: var(--gray-100);
+        }
+        
+        .section-title {
+            font-size: 24px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+        
+        /* Cards */
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+        
+        .card {
+            border: 1px solid var(--gray-200);
+            border-radius: 16px;
+            padding: 32px;
+            transition: all 0.2s ease;
+        }
+        
+        .card:hover {
+            border-color: var(--gray-400);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        
+        .card-title {
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+        }
+        
+        .badge {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 6px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        
+        .badge-black {
+            background: var(--gray-900);
+            color: var(--white);
+        }
+        
+        .badge-gray {
+            background: var(--gray-100);
+            color: var(--gray-600);
+        }
+        
+        .card-desc {
+            font-size: 15px;
+            color: var(--gray-500);
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        .features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        
+        .feature {
+            font-size: 13px;
+            color: var(--gray-700);
+            background: var(--gray-50);
+            padding: 6px 12px;
+            border-radius: 6px;
+        }
+        
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        
+        .tag {
+            font-size: 12px;
+            color: var(--gray-500);
+        }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 60px 0 40px;
+            border-top: 1px solid var(--gray-200);
+            margin-top: 40px;
+        }
+        
+        .footer a {
+            color: var(--gray-900);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .footer p {
+            color: var(--gray-400);
+            font-size: 14px;
+            margin-top: 12px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container { padding: 40px 20px; }
+            .logo { font-size: 48px; }
+            .stats { gap: 40px; }
+            .stat-num { font-size: 32px; }
+            .cards { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1 class="logo"><span>Mini</span>Max</h1>
+            <p class="tagline">全栈模型矩阵 · 赋能无限可能</p>
+        </header>
+        
+        <!-- Stats -->
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-num">130K+</div>
+                <div class="stat-label">企业客户及开发者</div>
+            </div>
+            <div class="stat">
+                <div class="stat-num">40+</div>
+                <div class="stat-label">服务国家及地区</div>
+            </div>
+            <div class="stat">
+                <div class="stat-num">1000B+</div>
+                <div class="stat-label">日均处理Token</div>
+            </div>
+        </div>
+        
+        <!-- 文本模型 -->
+        <section class="section">
+            <div class="section-header">
+                <div class="section-icon">📝</div>
+                <h2 class="section-title">文本模型</h2>
+            </div>
+            <div class="cards">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">M2.5</h3>
+                        <span class="badge badge-black">旗舰</span>
+                    </div>
+                    <p class="card-desc">全面升级的通用大模型，更强推理、更广知识、更精代码</p>
+                    <div class="features">
+                        <span class="feature">超强推理</span>
+                        <span class="feature">200K上下文</span>
+                        <span class="feature">多语言</span>
+                    </div>
+                    <div class="tags">
+                        <span class="tag">文本生成 · 代码编写 · 逻辑推理</span>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">M2-her</h3>
+                        <span class="badge badge-gray">角色扮演</span>
+                    </div>
+                    <p class="card-desc">多角色沉浸扮演，驾驭长轮次复杂对话场景</p>
+                    <div class="features">
+                        <span class="feature">多角色切换</span>
+                        <span class="feature">长记忆</span>
+                        <span class="feature">情感理解</span>
+                    </div>
+                    <div class="tags">
+                        <span class="tag">角色扮演 · 对话系统</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 语音模型 -->
+        <section class="section">
+            <div class="section-header">
+                <div class="section-icon">🎤</div>
+                <h2 class="section-title">语音模型</h2>
+            </div>
+            <div class="cards">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Speech 2.8</h3>
+                        <span class="badge badge-black">超低延时</span>
+                    </div>
+                    <p class="card-desc">为Agent而"声"，超低时延，智能生动</p>
+                    <div class="features">
+                        <span class="feature">100+音色</span>
+                        <span class="feature">语音克隆</span>
+                        <span class="feature">40种语言</span>
+                    </div>
+                    <div class="tags">
+                        <span class="tag">TTS · 语音克隆 · 情感合成</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 视频模型 -->
+        <section class="section">
+            <div class="section-header">
+                <div class="section-icon">🎬</div>
+                <h2 class="section-title">视频模型</h2>
+            </div>
+            <div class="cards">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Hailuo 2.3</h3>
+                        <span class="badge badge-black">极致动态</span>
+                    </div>
+                    <p class="card-desc">动静皆非凡，极致动态，入微传情</p>
+                    <div class="features">
+                        <span class="feature">文生视频</span>
+                        <span class="feature">图生视频</span>
+                        <span class="feature">首尾帧</span>
+                        <span class="feature">人物一致性</span>
+                    </div>
+                    <div class="tags">
+                        <span class="tag">6s/10s · 768P/1080P · 智能运镜</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 音乐模型 -->
+        <section class="section">
+            <div class="section-header">
+                <div class="section-icon">🎵</div>
+                <h2 class="section-title">音乐模型</h2>
+            </div>
+            <div class="cards">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Music 2.5</h3>
+                        <span class="badge badge-gray">全维度突破</span>
+                    </div>
+                    <p class="card-desc">编曲混音、人声表现、结构精度、声音设计四大维度突破</p>
+                    <div class="features">
+                        <span class="feature">标准歌曲</span>
+                        <span class="feature">纯器乐</span>
+                        <span class="feature">哼唱</span>
+                        <span class="feature">自动写词</span>
+                    </div>
+                    <div class="tags">
+                        <span class="tag">多风格 · 高清音质</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 图像模型 -->
+        <section class="section">
+            <div class="section-header">
+                <div class="section-icon">🎨</div>
+                <h2 class="section-title">图像模型</h2>
+            </div>
+            <div class="cards">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">image-01</h3>
+                    </div>
+                    <p class="card-desc">高精度图像生成，支持多种风格和比例</p>
+                    <div class="features">
+                        <span class="feature">文生图</span>
+                        <span class="feature">图生图</span>
+                        <span class="feature">主体参考</span>
+                    </div>
+                    <div class="tags">
+                        <span class="tag">16:9 · 9:16 · 1:1 · 4:3</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Footer -->
+        <footer class="footer">
+            <a href="https://platform.minimaxi.com">platform.minimaxi.com</a>
+            <p>与所有人共创智能</p>
+        </footer>
+    </div>
+</body>
+</html>
