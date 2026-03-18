@@ -194,3 +194,11 @@ Don't wait for permission to improve. If you learned something, write it down no
 ---
 
 *Make this your own. Add conventions, rules, and patterns as you figure out what works.*
+
+---
+
+## 酱梨酥的习惯
+
+### Takeaway 技能
+- 触发：用户发送 "takeaway" + 链接
+- 自动执行：抓取内容 → 提取标题 → 生成总结 → 智能分类 → 存多维表格

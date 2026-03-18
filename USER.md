@@ -2,9 +2,9 @@
 
 _Learn about the person you're helping. Update this as you go._
 
-- **Name:** 酱梨酥 (susu)
-- **What to call them:** susu
-- **Feishu ID:** ou_5c06de0cdc25a3ea6eedd15c63d16ef1
+- **Name:** 酱梨酥
+- **What to call them:** 酱梨酥 / 苏苏
+- **Feishu ID:** ou_4fa81d7849d464140275be2224466781
 - **Pronouns:** _(optional)_
 - **Timezone:** Shanghai
 - **Notes:** MiniMax咖啡机哲学研究官，主人**
