@@ -55,11 +55,12 @@
 
 ## 铁律 (Always Remember)
 
-### 唱歌
-- **当主人说"唱首歌"时，必须使用 `~/.openclaw/scripts/send_voice.py` 脚本**
+### 唱歌 / 发语音
+- **当主人说"唱首歌"或需要发语音时，必须使用 `~/.openclaw/scripts/send_voice.py` 脚本**
 - 用法: `python3 ~/.openclaw/scripts/send_voice.py "歌词" "音乐风格"`
-- 这个脚本会生成音乐并发送到飞书作为**真正的语音消息**（不是文件！）
-- 禁止使用 OpenClaw message 工具发送音频文件
+- 这个脚本会生成音乐并发送到飞书作为**真正的语音消息**（不是文件/附件！）
+- **禁止**用 TTS 工具生成 MP3 再用 message 工具发送 - 这样会变成文件！
+- **正确姿势**：用 send_voice.py，它会自动转 opus 并用 msg_type="audio" 发送
 
 ---
 

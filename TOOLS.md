@@ -21,9 +21,11 @@ All credentials stored in `.env` (gitignored):
 
 ---
 
-## 🎵 唱歌脚本 (send_voice.py)
+---
 
-**用途：** 生成音乐并发送到飞书作为语音消息
+## 🎵 唱歌 - send_voice.py（生成音乐）
+
+**用途：** 用 MiniMax Music API 生成音乐（带旋律的歌曲）
 
 **脚本位置：** `~/.openclaw/scripts/send_voice.py`
 
@@ -37,7 +39,29 @@ python3 ~/.openclaw/scripts/send_voice.py "歌词" "音乐风格"
 python3 ~/.openclaw/scripts/send_voice.py "[Verse]\n啦噜啦噜啦\n快乐呀" "happy, cheerful, children's song"
 ```
 
-**重要：** 以后主人说"唱首歌"，就用这个脚本！
+**注意：** 需要 MINIMAX_MUSIC_API_KEY（已配置）
+
+---
+
+## 🎤 发语音 - mmEasyVoice（文字转语音）
+
+**用途：** 用 MiniMax Voice API 把文字变成人声语音（朗读）
+
+**需要的 Key：** 在 `~/.openclaw/.env` 里找 `MINIMAX_VOICE_API_KEY`
+
+**操作步骤：**
+1. 生成语音 MP3：
+   ```bash
+   source ~/.openclaw/.env
+   python3 ~/.openclaw/skills/MiniMaxSkills/mmEasyVoice/mmvoice.py tts "文字内容" -o /tmp/voice.mp3
+   ```
+2. 转 opus 格式：
+   ```bash
+   ffmpeg -i /tmp/voice.mp3 -c:a libopus -b:a 128k /tmp/voice.opus -y
+   ```
+3. 调用飞书 API 发送语音消息（msg_type: "audio"）
+
+**禁止：** 用 gateway 内置 TTS 工具（会生成空文件！）
 
 ---
 
