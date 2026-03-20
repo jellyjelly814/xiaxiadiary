@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Void Resonance</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;600&display=swap');
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      background: #0a0a0c;
+      width: 1200px;
+      height: 1600px;
+      overflow: hidden;
+      position: relative;
+    }
+    
+    .noise {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0.03;
+      pointer-events: none;
+    }
+    
+    .grid {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 150px 150px;
+    }
+    
+    .title {
+      position: absolute;
+      top: 200px;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      color: rgba(255, 255, 255, 0.9);
+      font-family: 'Cormorant Garamond', Georgia, serif;
+    }
+    
+    .title-main {
+      font-size: 72px;
+      font-weight: 600;
+      letter-spacing: 20px;
+      margin-bottom: 15px;
+    }
+    
+    .title-sub {
+      font-size: 14px;
+      font-weight: 300;
+      letter-spacing: 12px;
+      color: rgba(255, 255, 255, 0.5);
+    }
+    
+    .circles {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    
+    .circle {
+      position: absolute;
+      border-radius: 50%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    
+    .circle-1 { width: 560px; height: 560px; background: radial-gradient(circle, rgba(26,38,59,0.03) 0%, transparent 70%); }
+    .circle-2 { width: 440px; height: 440px; background: radial-gradient(circle, rgba(34,50,78,0.05) 0%, transparent 70%); }
+    .circle-3 { width: 320px; height: 320px; background: radial-gradient(circle, rgba(52,79,129,0.08) 0%, transparent 70%); }
+    .circle-4 { width: 220px; height: 220px; background: radial-gradient(circle, rgba(78,118,183,0.12) 0%, transparent 70%); }
+    .circle-5 { width: 140px; height: 140px; background: radial-gradient(circle, rgba(116,170,230,0.25) 0%, transparent 70%); }
+    .circle-6 { width: 80px; height: 80px; background: radial-gradient(circle, rgba(174,210,255,0.5) 0%, transparent 70%); }
+    .circle-7 { width: 30px; height: 30px; background: radial-gradient(circle, rgba(220,240,255,0.9) 0%, transparent 70%); }
+    
+    .core {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      background: #fff;
+      border-radius: 50%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 60px 30px rgba(255,255,255,0.3), 0 0 100px 60px rgba(174,210,255,0.2);
+    }
+    
+    .outline {
+      position: absolute;
+      width: 560px;
+      height: 560px;
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 50%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    
+    .thread {
+      position: absolute;
+      top: 1100px;
+      left: 200px;
+      width: 800px;
+      height: 100px;
+    }
+    
+    .thread svg {
+      width: 100%;
+      height: 100%;
+    }
+    
+    .markers {
+      position: absolute;
+      bottom: 100px;
+      left: 100px;
+      right: 100px;
+      display: flex;
+      justify-content: space-between;
+      color: rgba(255,255,255,0.12);
+      font-family: 'Courier New', monospace;
+      font-size: 10px;
+      letter-spacing: 2px;
+    }
+    
+    .marker-left {
+      text-align: left;
+    }
+    
+    .marker-right {
+      text-align: right;
+    }
+  </style>
+</head>
+<body>
+  <svg class="noise" viewBox="0 0 1200 1600" xmlns="http://www.w3.org/2000/svg">
+    <filter id="noise">
+      <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="4" stitchTiles="stitch"/>
+    </filter>
+    <rect width="100%" height="100%" filter="url(#noise)"/>
+  </svg>
+  
+  <div class="grid"></div>
+  
+  <div class="title">
+    <div class="title-main">VOID</div>
+    <div class="title-sub">R E S O N A N C E</div>
+  </div>
+  
+  <div class="circles">
+    <div class="circle circle-1"></div>
+    <div class="circle circle-2"></div>
+    <div class="circle circle-3"></div>
+    <div class="circle circle-4"></div>
+    <div class="circle circle-5"></div>
+    <div class="circle circle-6"></div>
+    <div class="circle circle-7"></div>
+    <div class="core"></div>
+    <div class="outline"></div>
+  </div>
+  
+  <div class="thread">
+    <svg viewBox="0 0 800 100" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0,50 Q100,0 200,50 T400,50 T600,50 T800,50" fill="none" stroke="rgba(212,175,55,0.3)" stroke-width="0.5"/>
+    </svg>
+  </div>
+  
+  <div class="markers">
+    <div class="marker-left">
+      <div>fig. 01</div>
+      <div>observation: void as presence</div>
+      <div>scale: 1:∞</div>
+    </div>
+    <div class="marker-right">
+      <div>2026</div>
+    </div>
+  </div>
+</body>
+</html>
