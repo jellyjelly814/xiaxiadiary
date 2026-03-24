@@ -45,14 +45,16 @@ python3 ~/.openclaw/scripts/send_voice.py "[Verse]\n啦噜啦噜啦\n快乐呀" 
 
 ## 🎤 发语音 - mmEasyVoice（文字转语音）
 
+**状态：** ✅ 已配置（2026-03-20）
+
 **用途：** 用 MiniMax Voice API 把文字变成人声语音（朗读）
 
-**需要的 Key：** 在 `~/.openclaw/.env` 里找 `MINIMAX_VOICE_API_KEY`
+**需要的 Key：** 在 `~/.openclaw/.env` 里的 `MINIMAX_VOICE_API_KEY`
 
 **操作步骤：**
 1. 生成语音 MP3：
    ```bash
-   source ~/.openclaw/.env
+   export MINIMAX_VOICE_API_KEY='sk-api-3HWSIa...'  # 从 ~/.openclaw/.env 读取
    python3 ~/.openclaw/skills/MiniMaxSkills/mmEasyVoice/mmvoice.py tts "文字内容" -o /tmp/voice.mp3
    ```
 2. 转 opus 格式：
