@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "minimax": {
+      "command": "minimax-coding-plan-mcp",
+      "env": {
+        "MINIMAX_API_KEY": "sk-cp-kxLG9iDwhTha-g188z1i69BBEfwYD5Oo1QUpKxpvkYUd1MQWanAgETrLeUZ-2k1XiuJIVS17VHHQ4C_rcMLHLTdE00sjhMj0YADL7INEYDKxxdGdC477U4k",
+        "MINIMAX_API_HOST": "https://api.minimax.chat"
+      }
+    }
+  }
+}
