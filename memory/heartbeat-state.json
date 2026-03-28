@@ -1,9 +1,9 @@
 {
-  "lastHeartbeat": "2026-03-25T09:15:00Z",
-  "status": "ok",
+  "lastHeartbeat": "2026-03-28T11:46:00Z",
+  "status": "recovering",
   "notes": [
-    "下午配置了mcporter + minimax-coding-plan-mcp MCP服务器",
-    "AI日报12点cron失败(timeout)，已手动补发到群",
-    "日记21点cron待运行"
+    "WS连接已恢复(19:46成功重连)",
+    "仍有scope错误: operator.read缺失(仅影响部分读操作)",
+    "时间:周六晚上7:46"
   ]
 }

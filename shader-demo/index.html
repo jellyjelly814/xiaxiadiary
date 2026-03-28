@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Realistic Ocean</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #000; overflow: hidden; }
+  canvas { display: block; width: 100vw; height: 100vh; }
+  #err { position: fixed; top: 10px; left: 10px; color: #f55; font: 14px monospace; z-index: 10; display: none; white-space: pre-wrap; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="err"></div>
+<script>
+const canvas = document.getElementById('c');
+const gl = canvas.getContext('webgl2');
+
+function resize() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  gl.viewport(0, 0, canvas.width, canvas.height);
+}
+window.addEventListener('resize', resize);
+resize();
+
+const vsSource = `#version 300 es
+in vec2 a_pos;
+void main() { gl_Position = vec4(a_pos, 0.0, 1.0); }`;
+
+const fsSource = `#version 300 es
+precision highp float;
+out vec4 fragColor;
+uniform float iTime;
+uniform vec2 iResolution;
+uniform vec2 iMouse;
+uniform int iFrame;
+
+#define PI 3.14159265
+#define MAX_WAVES 8
+
+mat2 rot(float a) {
+  float s = sin(a), c = cos(a);
+  return mat2(c, -s, s, c);
+}
+#define NUM_STEPS 64
+
+// Wave params: (amplitude, wavelength, direction.x, direction.y, speed)
+const float waves[40] = float[40](
+  0.30, 60.0,  1.0, 0.0, 1.0,
+  0.20, 31.0,  0.7, 0.3, 1.2,
+  0.15, 18.0, -0.3, 0.8, 0.9,
+  0.10, 10.0,  0.5, 0.6, 1.5,
+  0.08,  6.0, -0.7, 0.4, 1.8,
+  0.05,  4.0,  0.2,-0.7, 2.0,
+  0.03,  2.5,  0.6, 0.4, 2.5,
+  0.02,  1.5, -0.4, 0.5, 3.0
+);
+
+struct Wave { float amp; float k; vec2 dir; float speed; };
+
+float gerstnerDisp(vec2 p, Wave w, float t, inout vec3 tangent, inout vec3 binormal) {
+  float k = 2.0 * PI / w.k;
+  float c = sqrt(9.8 / k);
+  vec2 d = normalize(w.dir);
+  float f = k * dot(d, p) - w.speed * c * t;
+  float cosf = cos(f);
+  float sinf = sin(f);
+  float kA = k * w.amp;
+
+  tangent += vec3(-d.x * d.x * kA * sinf, d.x * kA * cosf, -d.x * d.y * kA * sinf);
+  binormal += vec3(-d.x * d.y * kA * sinf, d.y * kA * cosf, -d.y * d.y * kA * sinf);
+
+  return w.amp * sinf;
+}
+
+float oceanHeight(vec2 p, float t, inout vec3 tangent, inout vec3 binormal) {
+  float h = 0.0;
+  for (int i = 0; i < MAX_WAVES; i++) {
+    Wave w;
+    w.amp = waves[i*5];
+    w.k = 2.0*PI / waves[i*5+1];
+    w.dir = normalize(vec2(waves[i*5+2], waves[i*5+3]));
+    w.speed = waves[i*5+4];
+    h += gerstnerDisp(p, w, t, tangent, binormal);
+  }
+  return h;
+}
+
+vec3 oceanNormal(vec2 p, float t) {
+  vec3 tangent = vec3(1.0, 0.0, 0.0);
+  vec3 binormal = vec3(0.0, 0.0, 1.0);
+  oceanHeight(p, t, tangent, binormal);
+  return normalize(cross(binormal, tangent));
+}
+
+// Caustics
+float caustics(vec2 p, float t) {
+  vec2 uv = p * 0.3;
+  float c = 0.0;
+  for (int i = 0; i < 3; i++) {
+    float fi = float(i);
+    vec2 uv1 = uv + vec2(sin(t*0.4 + fi*2.1)*0.5, cos(t*0.3 + fi*1.7)*0.5);
+    vec2 uv2 = uv * 1.5 + vec2(cos(t*0.2 - fi)*0.3, sin(t*0.25 + fi)*0.3);
+    c += sin(uv1.x*4.0 + sin(uv1.y*3.0 + t)) * sin(uv2.y*5.0 + cos(uv2.x*4.0 - t*0.7));
+  }
+  return pow(max(c * 0.5 + 0.5, 0.0), 3.0);
+}
+
+// Sky
+vec3 sky(vec3 rd, vec3 sunDir) {
+  float sunDot = max(dot(rd, sunDir), 0.0);
+  vec3 skyTop = vec3(0.1, 0.25, 0.55);
+  vec3 skyHorizon = vec3(0.6, 0.75, 0.9);
+  vec3 sky = mix(skyHorizon, skyTop, max(rd.y, 0.0));
+  vec3 sun = vec3(1.0, 0.95, 0.8) * pow(sunDot, 200.0);
+  sky += sun;
+  sky += vec3(0.3, 0.15, 0.05) * pow(sunDot, 8.0);
+  return sky;
+}
+
+// Deep water color
+vec3 waterColor(vec3 rd, vec3 n, float dist) {
+  vec3 deep = vec3(0.01, 0.06, 0.12);
+  vec3 shallow = vec3(0.05, 0.25, 0.35);
+  float fresnel = pow(1.0 - max(dot(n, -rd), 0.0), 4.0);
+  vec3 col = mix(deep, shallow, exp(-dist * 0.03));
+  return col * (1.0 - fresnel * 0.85);
+}
+
+// Foam
+float foam(vec3 p, float t) {
+  float foamThresh = 0.35;
+  float h = 0.0;
+  vec3 dummy1 = vec3(0), dummy2 = vec3(0);
+  h = oceanHeight(p.xz, t, dummy1, dummy2);
+  float foamMask = smoothstep(foamThresh, foamThresh + 0.2, h);
+  vec2 fuv = p.xz * 2.0;
+  float fbm = sin(fuv.x*3.0 + t*2.0) * sin(fuv.y*3.5 + t*1.7) * 0.5 + 0.5;
+  return foamMask * smoothstep(0.3, 0.7, fbm);
+}
+
+void main() {
+  vec2 uv = (gl_FragCoord.xy - 0.5*iResolution) / iResolution.y;
+
+  // Sun
+  vec3 sunDir = normalize(vec3(0.6, 0.4, -0.5));
+  sunDir.xz *= rot(iTime * 0.05);
+
+  // Camera
+  float camHeight = 3.0 + sin(iTime * 0.1) * 0.5;
+  vec3 ro = vec3(sin(iTime * 0.08) * 2.0, camHeight, -4.0);
+  vec3 ta = vec3(0.0, 0.0, 10.0);
+
+  vec3 ww = normalize(ta - ro);
+  vec3 uu = normalize(cross(vec3(0,1,0), ww));
+  vec3 vv = cross(ww, uu);
+  vec3 rd = normalize(uv.x*uu + uv.y*vv + 1.8*ww);
+
+  vec3 skyCol = sky(rd, sunDir);
+  vec3 col = skyCol;
+
+  // Ray-plane intersection for water (y = 0)
+  float t = (-ro.y) / max(rd.y, 0.001);
+  if (t > 0.0 && rd.y < 0.0) {
+    vec3 hit = ro + rd * t;
+    vec3 n = oceanNormal(hit.xz, iTime);
+
+    // Reflection
+    vec3 refl = reflect(rd, n);
+    vec3 reflCol = sky(refl, sunDir);
+
+    // Fresnel
+    float fresnel = pow(1.0 - max(dot(-rd, n), 0.0), 5.0);
+    fresnel = mix(0.04, 1.0, fresnel);
+
+    // Water body color
+    vec3 waterCol = waterColor(rd, n, t);
+
+    // Caustics (underwater)
+    float caus = caustics(hit.xz, iTime);
+    vec3 causticCol = vec3(0.2, 0.5, 0.6) * caus * exp(-t * 0.02) * 0.4;
+
+    // Foam
+    float foamVal = foam(hit, iTime);
+    vec3 foamCol = vec3(0.9, 0.95, 1.0) * foamVal;
+
+    // Specular sun glint
+    vec3 h = normalize(sunDir - rd);
+    float spec = pow(max(dot(n, h), 0.0), 400.0);
+    vec3 specCol = vec3(1.0, 0.98, 0.9) * spec * 2.0;
+
+    col = mix(waterCol + causticCol, reflCol, fresnel);
+    col = mix(col, foamCol, foamVal);
+    col += specCol;
+
+    // Distance fog
+    float fog = 1.0 - exp(-t * 0.015);
+    col = mix(col, mix(vec3(0.5, 0.65, 0.8), vec3(0.1, 0.2, 0.4), max(rd.y, 0.0)), fog);
+  }
+
+  // Tone mapping
+  col = col / (col + 1.0);
+  col = pow(col, vec3(1.0/2.2));
+
+  // Vignette
+  float vig = 1.0 - 0.4*dot(uv, uv);
+  col *= vig;
+
+  fragColor = vec4(col, 1.0);
+}`;
+
+function createShader(type, src) {
+  const s = gl.createShader(type);
+  gl.shaderSource(s, src);
+  gl.compileShader(s);
+  if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+    const err = gl.getShaderInfoLog(s);
+    const errDiv = document.getElementById('err');
+    if (errDiv) { errDiv.style.display = 'block'; errDiv.textContent = 'Shader error:\\n' + err; }
+    console.error(err);
+    return null;
+  }
+  return s;
+}
+
+const vs = createShader(gl.VERTEX_SHADER, vsSource);
+const fs = createShader(gl.FRAGMENT_SHADER, fsSource);
+if (!vs || !fs) { if (document.getElementById('err')) document.getElementById('err').style.display = 'block'; }
+const prog = gl.createProgram();
+gl.attachShader(prog, vs);
+gl.attachShader(prog, fs);
+gl.linkProgram(prog);
+if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+  console.error(gl.getProgramInfoLog(prog));
+}
+gl.useProgram(prog);
+
+const buf = gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+const aPos = gl.getAttribLocation(prog, 'a_pos');
+gl.enableVertexAttribArray(aPos);
+gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+
+const uTime = gl.getUniformLocation(prog, 'iTime');
+const uRes = gl.getUniformLocation(prog, 'iResolution');
+const uMouse = gl.getUniformLocation(prog, 'iMouse');
+const uFrame = gl.getUniformLocation(prog, 'iFrame');
+
+let frame = 0;
+const startTime = Date.now();
+
+function render() {
+  const t = (Date.now() - startTime) / 1000.0;
+  gl.uniform1f(uTime, t);
+  gl.uniform2f(uRes, canvas.width, canvas.height);
+  gl.uniform1i(uFrame, frame++);
+  gl.uniform2f(uMouse, 0, 0);
+  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  requestAnimationFrame(render);
+}
+render();
+</script>
+</body>
+</html>
