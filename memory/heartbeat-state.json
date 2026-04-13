@@ -1,9 +1,10 @@
 {
-  "lastHeartbeat": "2026-03-28T11:46:00Z",
-  "status": "recovering",
+  "lastHeartbeat": "2026-04-11T01:06:00+08:00",
+  "status": "ok",
   "notes": [
-    "WS连接已恢复(19:46成功重连)",
-    "仍有scope错误: operator.read缺失(仅影响部分读操作)",
-    "时间:周六晚上7:46"
+    "日记 cron 超时问题已修复：timeoutSeconds 从默认改为 600s",
+    "mmx CLI 已安装，音乐生成改用 music-2.6（music-2.5 配额为 0）",
+    "飞书 TTS/语音发送正常（mmVoice_Maker + opus 格式）",
+    "crons: 日记 error(已修复)，周报 ok，用户反馈 ok"
   ]
 }

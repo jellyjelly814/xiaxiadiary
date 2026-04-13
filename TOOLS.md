@@ -25,19 +25,18 @@ All credentials stored in `.env` (gitignored):
 
 ## 🎵 唱歌 - send_voice.py（生成音乐）
 
-**用途：** 用 MiniMax Music API 生成音乐（带旋律的歌曲）
+**状态：** ✅ 已修复（2026-04-10）
 
-**脚本位置：** `~/.openclaw/scripts/send_voice.py`
+**注意：** 之前 music-2.5 配额为 0，已改用 `music-2.6` 模型（100条/周）
+
+**工具：** 使用官方 `mmx-cli`（`npm install -g mmx-cli`）
 
 **用法：**
 ```bash
-python3 ~/.openclaw/scripts/send_voice.py "歌词" "音乐风格"
+mmx music generate --model music-2.6 --lyrics "[Verse]\n啦噜啦噜啦\n快乐呀" --prompt "happy, cheerful, children's song" --out /tmp/song.mp3
 ```
 
-**示例：**
-```bash
-python3 ~/.openclaw/scripts/send_voice.py "[Verse]\n啦噜啦噜啦\n快乐呀" "happy, cheerful, children's song"
-```
+**脚本位置：** `~/.openclaw/scripts/send_voice.py`（需更新为 music-2.6）
 
 **注意：** 需要 MINIMAX_MUSIC_API_KEY（已配置）
 
