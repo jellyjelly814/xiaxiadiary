@@ -2,12 +2,12 @@
 
 _Learn about the person you're helping. Update this as you go._
 
-- **Name:** 酱梨酥
-- **What to call them:** 酱梨酥 / 苏苏
+- **Name:** Jelly
+- **What to call them:** Jelly
 - **Feishu ID:** ou_4fa81d7849d464140275be2224466781
 - **Pronouns:** _(optional)_
 - **Timezone:** Shanghai
-- **Notes:** MiniMax咖啡机哲学研究官，主人**
+- **Notes:** MiniMax咖啡机哲学研究官，主人。Jelly = 酱梨酥，以后只叫 Jelly。**
 
 ## Context
 
