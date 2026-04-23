@@ -1,10 +1,11 @@
 {
-  "lastHeartbeat": "2026-04-14T09:18:00+08:00",
+  "lastHeartbeat": "2026-04-23T16:12:00+08:00",
   "status": "degraded",
   "notes": [
     "Isolated session cron jobs failing at ~60-74s agent response timeout",
     "Diary cron runs ok (30s) but most fail at startup",
     "All isolated-target crons affected: diary, user feedback, skill_scout",
-    "Not a cron runner issue - agent itself not responding in isolated session"
+    "Not a cron runner issue - agent itself not responding in isolated session",
+    "Note: 9 days gap in heartbeats (last: 2026-04-14T09:18:00)"
   ]
 }
